@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels:
+    app: nuvem
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nuvem
+      tier: api
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nuvem
+        tier: api
+    spec:
+      containers:
+      - image: thiagopereirati/nuvem_api:1.0.0
+        name: api
+        env:
+        - name: MONGODB_HOST
+          value: mongodb
+        - name: MONGODB_USER
+          valueFrom:
+            secretKeyRef:
+              name: mongodb
+              key: username
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb
+              key: password
+        ports:
+        - containerPort: 8080
+          name: api
