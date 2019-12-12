@@ -414,10 +414,6 @@ async function start() {
 
     // Ler variáveis de ambiente
     const { MONGODB_HOST, MONGODB_USER, MONGODB_PASSWORD } = process.env
-    console.log(`MONGODB_HOST: ${MONGODB_HOST}`)
-    console.log(`MONGODB_USER: ${MONGODB_USER}`)
-    console.log(`MONGODB_PASSWORD: ${MONGODB_PASSWORD}`)
-    console.log(`MONGODB URL => mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:27017`)
 
     // Conectar ao banco MongoDB
     const connect = util.promisify(MongoClient.connect)
