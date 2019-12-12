@@ -31,12 +31,11 @@ app.get('/listas', (req, res) => {
             return
         }
 
-        res.send({
-            "items": docs.map(i => {
+        res.send(docs.map(i => {
                 delete i._id
                 return i
             })
-        })
+        )
         res.end()
     })
 })
@@ -197,12 +196,11 @@ app.get('/listas/:idlista/tarefas', (req, res) => {
         }
 
         // Listar tarefas
-        res.send({
-            "items": docs.map(i => {
-                delete i._id
-                return i
-            })
+        res.send(docs.map(i => {
+            delete i._id
+            return i
         })
+        )
         res.end()
     })
 })
