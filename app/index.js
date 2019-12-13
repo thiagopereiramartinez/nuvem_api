@@ -32,9 +32,10 @@ app.get('/listas', (req, res) => {
         }
 
         res.send(docs.map(i => {
-                delete i._id
-                return i
-            })
+            i.id = i._id
+            delete i._id
+            return i
+        })
         )
         res.end()
     })
@@ -45,7 +46,7 @@ app.get('/listas/:id', (req, res) => {
 
     const { id } = req.params
 
-    db.collection('listas').find({ id: +id }).toArray((err, docs) => {
+    db.collection('listas').find({ _id: id }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -60,6 +61,7 @@ app.get('/listas/:id', (req, res) => {
         }
 
         const lista = docs[0]
+        lista.id = lista._id
         delete lista._id
 
         res.send(lista)
@@ -70,33 +72,18 @@ app.get('/listas/:id', (req, res) => {
 // POST - Inserir lista
 app.post('/listas', async (req, res) => {
 
-    const { id, nome } = req.body
+    const { nome } = req.body
 
-    // Testar se já existe uma lista com o mesmo ID
-    db.collection('listas').find({ id: +id }).toArray((err, docs) => {
+    // Inserir lista
+    db.collection('listas').insertOne({ nome: nome }, (err, result) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
             return
         }
 
-        if (docs.length > 0) {
-            res.status(400).send({ "message": "Lista já possui cadastro." })
-            res.send()
-            return
-        }
-
-        // Inserir lista
-        db.collection('listas').insertOne({ id: +id, nome: nome }, (err, result) => {
-            if (err) {
-                res.status(500).send('Internal Server Error')
-                res.end()
-                return
-            }
-
-            res.send({ "message": "OK" })
-            res.end()
-        })
+        res.send({ "message": "OK" })
+        res.end()
     })
 
 })
@@ -108,7 +95,7 @@ app.put('/listas/:id', async (req, res) => {
     const { nome } = req.body
 
     // Testar se a lista existe
-    db.collection('listas').find({ id: +id }).toArray((err, docs) => {
+    db.collection('listas').find({ _id: id }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -122,7 +109,7 @@ app.put('/listas/:id', async (req, res) => {
         }
 
         // Alterar lista
-        db.collection('listas').updateOne({ id: +id }, { $set: { nome: nome } }, (err, result) => {
+        db.collection('listas').updateOne({ _id: id }, { $set: { nome: nome } }, (err, result) => {
             if (err) {
                 res.status(500).send('Internal Server Error')
                 res.end()
@@ -142,7 +129,7 @@ app.delete('/listas/:id', (req, res) => {
     const { id } = req.params
 
     // Testar se a lista existe
-    db.collection('listas').find({ id: +id }).toArray((err, docs) => {
+    db.collection('listas').find({ _id: id }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -156,7 +143,7 @@ app.delete('/listas/:id', (req, res) => {
         }
 
         // Apagar tarefas relacionadas a lista
-        db.collection('tarefas').deleteMany({ idlista: +id }, (err, result) => {
+        db.collection('tarefas').deleteMany({ idlista: id }, (err, result) => {
             if (err) {
                 res.status(500).send('Internal Server Error')
                 res.end()
@@ -164,7 +151,7 @@ app.delete('/listas/:id', (req, res) => {
             }
 
             // Apagar lista
-            db.collection('listas').deleteOne({ id: +id }, (err, result) => {
+            db.collection('listas').deleteOne({ _id: id }, (err, result) => {
                 if (err) {
                     res.status(500).send('Internal Server Error')
                     res.end()
@@ -188,7 +175,7 @@ app.get('/listas/:idlista/tarefas', (req, res) => {
 
     const { idlista } = req.params
 
-    db.collection('tarefas').find({ idlista: +idlista }).toArray((err, docs) => {
+    db.collection('tarefas').find({ idlista: idlista }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -197,6 +184,7 @@ app.get('/listas/:idlista/tarefas', (req, res) => {
 
         // Listar tarefas
         res.send(docs.map(i => {
+            i.id = i._id
             delete i._id
             return i
         })
@@ -210,7 +198,7 @@ app.get('/listas/:idlista/tarefas/:idtarefa', (req, res) => {
 
     const { idlista, idtarefa } = req.params
 
-    db.collection('tarefas').find({ id: +idtarefa, idlista: +idlista }).toArray((err, docs) => {
+    db.collection('tarefas').find({ _id: idtarefa, idlista: idlista }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -224,10 +212,11 @@ app.get('/listas/:idlista/tarefas/:idtarefa', (req, res) => {
             return
         }
 
-        const lista = docs[0]
-        delete lista._id
+        const tarefa = docs[0]
+        tarefa.id = tarefa._id
+        delete tarefa._id
 
-        res.send(lista)
+        res.send(tarefa)
         res.end()
     })
 })
@@ -236,33 +225,18 @@ app.get('/listas/:idlista/tarefas/:idtarefa', (req, res) => {
 app.post('/listas/:idlista/tarefas', async (req, res) => {
 
     const { idlista } = req.params
-    const { id, tarefa, created_at, status } = req.body
+    const { tarefa, created_at, status } = req.body
 
-    // Testar se já existe uma tarefa com o mesmo ID
-    db.collection('tarefas').find({ id: +id, idlista: +idlista }).toArray((err, docs) => {
+    // Inserir tarefa
+    db.collection('tarefas').insertOne({ idlista: idlista, tarefa: tarefa, created_at: created_at, status: status }, (err, result) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
             return
         }
 
-        if (docs.length > 0) {
-            res.status(400).send({ "message": "Tarefa já possui cadastro." })
-            res.send()
-            return
-        }
-
-        // Inserir tarefa
-        db.collection('tarefas').insertOne({ id: +id, idlista: +idlista, tarefa: tarefa, created_at: created_at, status: status }, (err, result) => {
-            if (err) {
-                res.status(500).send('Internal Server Error')
-                res.end()
-                return
-            }
-
-            res.send({ "message": "OK" })
-            res.end()
-        })
+        res.send({ "message": "OK" })
+        res.end()
     })
 
 })
@@ -274,7 +248,7 @@ app.put('/listas/:idlista/tarefas/:idtarefa', async (req, res) => {
     const { tarefa, created_at, status } = req.body
 
     // Testar se existe a tarefa
-    db.collection('tarefas').find({ id: +idtarefa, idlista: +idlista }).toArray((err, docs) => {
+    db.collection('tarefas').find({ _id: idtarefa, idlista: idlista }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -288,7 +262,7 @@ app.put('/listas/:idlista/tarefas/:idtarefa', async (req, res) => {
         }
 
         // Alterar tarefa
-        db.collection('tarefas').updateOne({ id: +idtarefa, idlista: +idlista }, { $set: { idlista: +idlista, tarefa: tarefa, created_at: created_at, status: status } }, (err, result) => {
+        db.collection('tarefas').updateOne({ _id: idtarefa, idlista: idlista }, { $set: { idlista: idlista, tarefa: tarefa, created_at: created_at, status: status } }, (err, result) => {
             if (err) {
                 res.status(500).send('Internal Server Error')
                 res.end()
@@ -309,7 +283,7 @@ app.patch('/listas/:idlista/tarefas/:idtarefa', async (req, res) => {
     const { tarefa } = req.body
 
     // Testar se existe a tarefa
-    db.collection('tarefas').find({ id: +idtarefa, idlista: +idlista }).toArray((err, docs) => {
+    db.collection('tarefas').find({ _id: idtarefa, idlista: idlista }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -323,7 +297,7 @@ app.patch('/listas/:idlista/tarefas/:idtarefa', async (req, res) => {
         }
 
         // Alterar tarefa
-        db.collection('tarefas').updateOne({ id: +idtarefa, idlista: +idlista }, { $set: { tarefa: tarefa } }, (err, result) => {
+        db.collection('tarefas').updateOne({ _id: idtarefa, idlista: idlista }, { $set: { tarefa: tarefa } }, (err, result) => {
             if (err) {
                 res.status(500).send('Internal Server Error')
                 res.end()
@@ -344,7 +318,7 @@ app.patch('/listas/:idlista/tarefas/:idtarefa/status', async (req, res) => {
     const { status } = req.body
 
     // Testar se existe a tarefa
-    db.collection('tarefas').find({ id: +idtarefa, idlista: +idlista }).toArray((err, docs) => {
+    db.collection('tarefas').find({ _id: idtarefa, idlista: idlista }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -358,7 +332,7 @@ app.patch('/listas/:idlista/tarefas/:idtarefa/status', async (req, res) => {
         }
 
         // Alterar tarefa
-        db.collection('tarefas').updateOne({ id: +idtarefa, idlista: +idlista }, { $set: { status: status } }, (err, result) => {
+        db.collection('tarefas').updateOne({ _id: idtarefa, idlista: idlista }, { $set: { status: status } }, (err, result) => {
             if (err) {
                 res.status(500).send('Internal Server Error')
                 res.end()
@@ -378,7 +352,7 @@ app.delete('/listas/:idlista/tarefas/:idtarefa', (req, res) => {
     const { idlista, idtarefa } = req.params
 
     // Testar se existe a tarefa
-    db.collection('tarefas').find({ id: +idtarefa, idlista: +idlista }).toArray((err, docs) => {
+    db.collection('tarefas').find({ _id: idtarefa, idlista: idlista }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -392,7 +366,7 @@ app.delete('/listas/:idlista/tarefas/:idtarefa', (req, res) => {
         }
 
         // Apagar tarefa
-        db.collection('tarefas').deleteOne({ id: +idtarefa, idlista: +idlista }, (err, result) => {
+        db.collection('tarefas').deleteOne({ _id: idtarefa, idlista: idlista }, (err, result) => {
             if (err) {
                 res.status(500).send('Internal Server Error')
                 res.end()
