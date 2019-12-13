@@ -46,7 +46,7 @@ app.get('/listas/:id', (req, res) => {
 
     const { id } = req.params
 
-    db.collection('listas').find({ _id: id }).toArray((err, docs) => {
+    db.collection('listas').find({ _id: MongoClient.ObjectId(id) }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -95,7 +95,7 @@ app.put('/listas/:id', async (req, res) => {
     const { nome } = req.body
 
     // Testar se a lista existe
-    db.collection('listas').find({ _id: id }).toArray((err, docs) => {
+    db.collection('listas').find({ _id: MongoClient.ObjectId(id) }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -109,7 +109,7 @@ app.put('/listas/:id', async (req, res) => {
         }
 
         // Alterar lista
-        db.collection('listas').updateOne({ _id: id }, { $set: { nome: nome } }, (err, result) => {
+        db.collection('listas').updateOne({ _id: MongoClient.ObjectId(id) }, { $set: { nome: nome } }, (err, result) => {
             if (err) {
                 res.status(500).send('Internal Server Error')
                 res.end()
@@ -129,7 +129,7 @@ app.delete('/listas/:id', (req, res) => {
     const { id } = req.params
 
     // Testar se a lista existe
-    db.collection('listas').find({ _id: id }).toArray((err, docs) => {
+    db.collection('listas').find({ _id: MongoClient.ObjectId(id) }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -151,7 +151,7 @@ app.delete('/listas/:id', (req, res) => {
             }
 
             // Apagar lista
-            db.collection('listas').deleteOne({ _id: id }, (err, result) => {
+            db.collection('listas').deleteOne({ _id: MongoClient.ObjectID(id) }, (err, result) => {
                 if (err) {
                     res.status(500).send('Internal Server Error')
                     res.end()
@@ -198,7 +198,7 @@ app.get('/listas/:idlista/tarefas/:idtarefa', (req, res) => {
 
     const { idlista, idtarefa } = req.params
 
-    db.collection('tarefas').find({ _id: idtarefa, idlista: idlista }).toArray((err, docs) => {
+    db.collection('tarefas').find({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -248,7 +248,7 @@ app.put('/listas/:idlista/tarefas/:idtarefa', async (req, res) => {
     const { tarefa, created_at, status } = req.body
 
     // Testar se existe a tarefa
-    db.collection('tarefas').find({ _id: idtarefa, idlista: idlista }).toArray((err, docs) => {
+    db.collection('tarefas').find({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -262,7 +262,7 @@ app.put('/listas/:idlista/tarefas/:idtarefa', async (req, res) => {
         }
 
         // Alterar tarefa
-        db.collection('tarefas').updateOne({ _id: idtarefa, idlista: idlista }, { $set: { idlista: idlista, tarefa: tarefa, created_at: created_at, status: status } }, (err, result) => {
+        db.collection('tarefas').updateOne({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }, { $set: { idlista: idlista, tarefa: tarefa, created_at: created_at, status: status } }, (err, result) => {
             if (err) {
                 res.status(500).send('Internal Server Error')
                 res.end()
@@ -283,7 +283,7 @@ app.patch('/listas/:idlista/tarefas/:idtarefa', async (req, res) => {
     const { tarefa } = req.body
 
     // Testar se existe a tarefa
-    db.collection('tarefas').find({ _id: idtarefa, idlista: idlista }).toArray((err, docs) => {
+    db.collection('tarefas').find({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -297,7 +297,7 @@ app.patch('/listas/:idlista/tarefas/:idtarefa', async (req, res) => {
         }
 
         // Alterar tarefa
-        db.collection('tarefas').updateOne({ _id: idtarefa, idlista: idlista }, { $set: { tarefa: tarefa } }, (err, result) => {
+        db.collection('tarefas').updateOne({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }, { $set: { tarefa: tarefa } }, (err, result) => {
             if (err) {
                 res.status(500).send('Internal Server Error')
                 res.end()
@@ -318,7 +318,7 @@ app.patch('/listas/:idlista/tarefas/:idtarefa/status', async (req, res) => {
     const { status } = req.body
 
     // Testar se existe a tarefa
-    db.collection('tarefas').find({ _id: idtarefa, idlista: idlista }).toArray((err, docs) => {
+    db.collection('tarefas').find({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -332,7 +332,7 @@ app.patch('/listas/:idlista/tarefas/:idtarefa/status', async (req, res) => {
         }
 
         // Alterar tarefa
-        db.collection('tarefas').updateOne({ _id: idtarefa, idlista: idlista }, { $set: { status: status } }, (err, result) => {
+        db.collection('tarefas').updateOne({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }, { $set: { status: status } }, (err, result) => {
             if (err) {
                 res.status(500).send('Internal Server Error')
                 res.end()
@@ -352,7 +352,7 @@ app.delete('/listas/:idlista/tarefas/:idtarefa', (req, res) => {
     const { idlista, idtarefa } = req.params
 
     // Testar se existe a tarefa
-    db.collection('tarefas').find({ _id: idtarefa, idlista: idlista }).toArray((err, docs) => {
+    db.collection('tarefas').find({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }).toArray((err, docs) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -366,7 +366,7 @@ app.delete('/listas/:idlista/tarefas/:idtarefa', (req, res) => {
         }
 
         // Apagar tarefa
-        db.collection('tarefas').deleteOne({ _id: idtarefa, idlista: idlista }, (err, result) => {
+        db.collection('tarefas').deleteOne({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }, (err, result) => {
             if (err) {
                 res.status(500).send('Internal Server Error')
                 res.end()
