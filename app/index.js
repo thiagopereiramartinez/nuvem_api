@@ -82,7 +82,7 @@ app.post('/listas', async (req, res) => {
             return
         }
 
-        res.send({ "message": "OK" })
+        res.send({ "message": result.insertedId })
         res.end()
     })
 
@@ -235,7 +235,7 @@ app.post('/listas/:idlista/tarefas', async (req, res) => {
             return
         }
 
-        res.send({ "message": "OK" })
+        res.send({ "message": result.insertedId })
         res.end()
     })
 
