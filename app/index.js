@@ -225,10 +225,10 @@ app.get('/listas/:idlista/tarefas/:idtarefa', (req, res) => {
 app.post('/listas/:idlista/tarefas', async (req, res) => {
 
     const { idlista } = req.params
-    const { tarefa, created_at, status } = req.body
+    const { tarefa, created_at, completed } = req.body
 
     // Inserir tarefa
-    db.collection('tarefas').insertOne({ idlista: idlista, tarefa: tarefa, created_at: created_at, status: status }, (err, result) => {
+    db.collection('tarefas').insertOne({ idlista: idlista, tarefa: tarefa, created_at: created_at, completed: completed }, (err, result) => {
         if (err) {
             res.status(500).send('Internal Server Error')
             res.end()
@@ -245,7 +245,7 @@ app.post('/listas/:idlista/tarefas', async (req, res) => {
 app.put('/listas/:idlista/tarefas/:idtarefa', async (req, res) => {
 
     const { idlista, idtarefa } = req.params
-    const { tarefa, created_at, status } = req.body
+    const { tarefa, created_at, completed } = req.body
 
     // Testar se existe a tarefa
     db.collection('tarefas').find({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }).toArray((err, docs) => {
@@ -262,7 +262,7 @@ app.put('/listas/:idlista/tarefas/:idtarefa', async (req, res) => {
         }
 
         // Alterar tarefa
-        db.collection('tarefas').updateOne({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }, { $set: { idlista: idlista, tarefa: tarefa, created_at: created_at, status: status } }, (err, result) => {
+        db.collection('tarefas').updateOne({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }, { $set: { idlista: idlista, tarefa: tarefa, created_at: created_at, completed: completed } }, (err, result) => {
             if (err) {
                 res.status(500).send('Internal Server Error')
                 res.end()
@@ -315,7 +315,7 @@ app.patch('/listas/:idlista/tarefas/:idtarefa', async (req, res) => {
 app.patch('/listas/:idlista/tarefas/:idtarefa/status', async (req, res) => {
 
     const { idlista, idtarefa } = req.params
-    const { status } = req.body
+    const { completed } = req.body
 
     // Testar se existe a tarefa
     db.collection('tarefas').find({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }).toArray((err, docs) => {
@@ -332,7 +332,7 @@ app.patch('/listas/:idlista/tarefas/:idtarefa/status', async (req, res) => {
         }
 
         // Alterar tarefa
-        db.collection('tarefas').updateOne({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }, { $set: { status: status } }, (err, result) => {
+        db.collection('tarefas').updateOne({ _id: MongoClient.ObjectId(idtarefa), idlista: idlista }, { $set: { completed: completed } }, (err, result) => {
             if (err) {
                 res.status(500).send('Internal Server Error')
                 res.end()

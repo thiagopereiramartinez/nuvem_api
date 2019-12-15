@@ -19,7 +19,7 @@ spec:
         tier: api
     spec:
       containers:
-      - image: thiagopereirati/nuvem_api:1.0.1
+      - image: thiagopereirati/nuvem_api:1.0.7
         name: api
         env:
         - name: MONGODB_HOST
